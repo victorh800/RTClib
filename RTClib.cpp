@@ -432,35 +432,9 @@ void RTC_PCF8523::writeSqwPinMode(Pcf8523SqwPinMode mode) {
 // RTC_DS3231 implementation
 
 boolean RTC_DS3231::begin(void) {
-
   Wire.begin();
-
-  /*
-  https://github.com/adafruit/RTClib/issues/64
-  https://github.com/adafruit/RTClib/issues/96
-  */
-
-  // Checks if an actual RTC is responding to I2C commands
-  Wire.beginTransmission(DS3231_ADDRESS);
-  if (Wire.endTransmission() != 0) {
-    return false; 
-  }
-
-  /* 0x00..0x99 - Year in BCD
-  got 0xFF if chip not present */
-  if (read_i2c_register(DS3231_ADDRESS, 6) == 0xFF) {
-    return false;
-  }
-
-  /* Bits 6, 5, 4 of the DS3231 Status Register are always 0.
-  Reference: DS3231 data sheet, page 14 */
-  if ((read_i2c_register(DS3231_ADDRESS, DS3231_STATUSREG) & 0b01110000) != 0) {
-    return false;
-  }
-
   return true;
 }
-
 
 bool RTC_DS3231::lostPower(void) {
   return (read_i2c_register(DS3231_ADDRESS, DS3231_STATUSREG) >> 7);
